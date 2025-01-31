@@ -7,14 +7,21 @@ const Button = ({
   children,
   className,
   ...rest
-}: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> & {
+}: Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'onClick' | 'role' | 'type'
+> & {
   asChild?: boolean;
   onClick?: () => void;
 }) => {
   const Component = asChild ? Slot : 'button';
 
   return (
-    <Component {...rest} className={classNames('outline-blue-500', className)}>
+    <Component
+      {...rest}
+      className={classNames('outline-blue-500', className)}
+      type="button"
+    >
       {children}
     </Component>
   );

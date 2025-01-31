@@ -1,32 +1,36 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 const BASE_API_URL = 'http://localhost:3005';
 
-const useFetchData = () => {
-  const [products, setProducts] = useState<
-    {
-      id: string;
-      name: string;
-      characteristics: string[];
-    }[]
-  >([]);
+const useFetchData = (selectedCharacteristics: string[]) =>
+  useQuery({
+    queryKey: ['products', selectedCharacteristics.join(',')],
+    queryFn: async (): Promise<
+      {
+        characteristics: {
+          colorClasses: string;
+          id: string;
+          name: string;
+        }[];
+        id: number;
+        name: string;
+        score: number;
+      }[]
+    > => {
+      let query = '';
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(`${BASE_API_URL}/products`);
-        setProducts(response.data);
-        console.log('Products loaded:', response.data);
-      } catch (error) {
-        console.error('Error fetching products:', error);
+      console.log('selectedCharacteristics', selectedCharacteristics);
+
+      if (selectedCharacteristics.length > 0) {
+        query = `?characteristics=${selectedCharacteristics.join(
+          '&characteristics='
+        )}`;
       }
-    };
 
-    fetchProducts();
-  }, []);
+      const products = await fetch(`${BASE_API_URL}/products?${query}`);
 
-  return products;
-};
+      return await products.json();
+    },
+  });
 
 export default useFetchData;

@@ -1,20 +1,25 @@
-import { useId } from 'react';
-import ProductCard, { Tag, TagList, Title } from './components/ProductCard';
+import { useId, useState } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
 import ProductList from './components/ProductList';
+import CharacteristicsFilters from './components/CharacteristicsFilters';
 import useFetchData from './hooks/useFetchData';
-import TagToggleButtonGroup, {
-  Label,
-  List,
-  ListItem,
-  TagToggleButton,
-} from '../../components/TagToggleButtonGroup';
+import ContextProvider from './context/ContextProvider';
 
 const App = () => {
-  const products = useFetchData();
+  const [selectedCharacteristics, setSelectedCharacteristics] = useState<
+    string[]
+  >([]);
+  const { data, error, isError, isLoading } = useFetchData(
+    selectedCharacteristics
+  );
   const mainContentId = useId();
 
   return (
-    <>
+    <ContextProvider
+      selectedCharacteristics={selectedCharacteristics}
+      setSelectedCharacteristics={setSelectedCharacteristics}
+    >
       <a href={`#${mainContentId}`} className="sr-only sr-only-focusable">
         Skip to main content
       </a>
@@ -22,47 +27,26 @@ const App = () => {
         <header className="mb-6 text-2xl font-bold">
           <h1>Product Compass</h1>
         </header>
-
         <main id={mainContentId}>
-          <TagToggleButtonGroup className="mb-5">
-            <Label>Filter by characteristic:</Label>
-            <List>
-              <ListItem>
-                <TagToggleButton>Feature 1</TagToggleButton>
-              </ListItem>
-              <ListItem>
-                <TagToggleButton>Feature 2</TagToggleButton>
-              </ListItem>
-              <ListItem>
-                <TagToggleButton>Feature 3</TagToggleButton>
-              </ListItem>
-              <ListItem>
-                <TagToggleButton>Feature 3</TagToggleButton>
-              </ListItem>
-              <ListItem>
-                <TagToggleButton>Feature 3</TagToggleButton>
-              </ListItem>
-              <ListItem>
-                <TagToggleButton>Feature 3</TagToggleButton>
-              </ListItem>
-            </List>
-          </TagToggleButtonGroup>
-          <ProductList>
-            {products?.map(({ characteristics, id, name }) => (
-              <ProductCard key={id}>
-                <Title>{name}</Title>
-                <TagList>
-                  {characteristics.map((characteristic) => (
-                    <Tag key={characteristic}>{characteristic}</Tag>
-                  ))}
-                </TagList>
-              </ProductCard>
-            ))}
-          </ProductList>
+          <CharacteristicsFilters />
+          <ProductList
+            data={data}
+            error={error}
+            isError={isError}
+            isLoading={isLoading}
+          />
         </main>
       </div>
-    </>
+    </ContextProvider>
   );
 };
 
-export default App;
+const queryClient = new QueryClient();
+
+const QueryableApp = () => (
+  <QueryClientProvider client={queryClient}>
+    <App />
+  </QueryClientProvider>
+);
+
+export default QueryableApp;

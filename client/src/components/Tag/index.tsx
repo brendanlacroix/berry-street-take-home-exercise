@@ -7,7 +7,7 @@ const Tag = ({
   children,
   className,
   ...rest
-}: Omit<HTMLAttributes<HTMLDivElement>, 'onClick'> & {
+}: Omit<HTMLAttributes<HTMLDivElement>, 'onClick' | 'role'> & {
   asChild?: boolean;
 }) => {
   const Component = asChild ? Slot : 'div';
