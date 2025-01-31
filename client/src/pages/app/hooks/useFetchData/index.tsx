@@ -19,8 +19,6 @@ const useFetchData = (selectedCharacteristics: string[]) =>
     > => {
       let query = '';
 
-      console.log('selectedCharacteristics', selectedCharacteristics);
-
       if (selectedCharacteristics.length > 0) {
         query = `?characteristics=${selectedCharacteristics.join(
           '&characteristics='
